@@ -19,7 +19,21 @@ unsigned long lastChange = 0;
 bool useAcceleration = false;
 int accelerationFactor = 1;
 long offset = 0;
+
+bool floatSelected = 0;
+int floatSelPos = 0;
 // =========== FUNCTIONS =============
+int8 countDigit(int n)
+{
+    if (n == 0) return 1;
+    int8 count = 0;
+    while (n != 0) {
+        n = n / 10;
+        ++count;
+    }
+    return count;
+}
+
 
 void buildMenu(int8 menuEntryCount, String menuEntries[MAX_MENU], bool isMenuBig) {
   for (int8 x = 0; x < menuEntryCount; x++) {
@@ -161,7 +175,15 @@ bool updateValue() {
     else tempVarB = false;
     if (lastV == tempVarB) return false;
   } else if (type == 2) tempVarI += offset;
-  else if (type == 3) tempVarF = (float) analogRead(A3) / 100;
+  else if (type == 3) {
+    if (floatSelected) {
+      tempVarF += offset / pow(10, floatSelPos + 1);
+    } else {
+      floatSelPos += offset;
+      if (floatSelPos < 0) floatSelPos = 0;
+      else if (floatSelPos > FLOAT_POINTS - 1 ) floatSelPos = FLOAT_POINTS - 1;
+    }
+  }
 
   return true;
 }
@@ -180,7 +202,6 @@ void printEditor() {
   oled.println(varNames[vPos]);
   if (type == 1) oled.println(formatBool(varVals[vPos]));
   else if (type == 2) oled.println(varVals[vPos]);
-  else if (type == 3) oled.println(tempVarF, FLOAT_POINTS);
 
   if (type == 1) {
     oled.set2X();
@@ -201,11 +222,30 @@ void printEditor() {
     oled.println(tempVarI);
   } else if (type == 3) {
     oled.setInvertMode(0);
+
+    int8 cursor = countDigit(abs(tempVarF)) + 1;
+    String num = String(tempVarF, FLOAT_POINTS);
+    if (tempVarF < 0) cursor++;
+    cursor += floatSelPos;
+
+    if (!floatSelected) {
+      oled.setCursor(0, 1);
+      for (int x = 0; x < num.length(); x++) {
+        if (x == cursor) oled.print("\\/");
+        else oled.print("  ");
+      }
+    }
+
     oled.set2X();
     oled.setCursor(0, 2);
-    //oled.println(tempVarF, FLOAT_POINTS);
-    if (tempVarF < 0) oled.print('-');
-    oled.print((int) tempVarF);
-    oled.print('.');
+
+    for (int x = 0; x < num.length(); x++) {
+      if (floatSelected) {
+        if (x == cursor) oled.setInvertMode(1);
+        else oled.setInvertMode(0);
+      }
+
+      oled.print(num[x]);
+    }
   }
 }

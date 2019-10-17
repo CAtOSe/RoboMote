@@ -156,12 +156,18 @@ void loop() {
       if (updateValue()) printEditor();
     } else if (inputChange == 2 || inputChange == 4) {
       if (inputChange == 2) {
-        saveValue();
-        writeToFile(selectedSt);
+        if (type == 3) {
+          floatSelected = !floatSelected;
+          printEditor();
+        } else {
+          saveValue();
+          writeToFile(selectedSt);
+
+          menuState = 3;
+          resumeMenu();
+          printMenu();
+        }
       }
-      menuState = 3;
-      resumeMenu();
-      printMenu();
       delay(PRESS_DELAY);
     }
   }

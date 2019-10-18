@@ -1,0 +1,17 @@
+PROGRAMMING:
+0b0 01011 11011 1
+Tgl Addr  Dohyo Useless now
+
+START STOP:
+0b0 00111 11011 1
+Tgl Addr  Dohyo Start/Stop
+
+Exmpl: Programming
+irsend.sendRC5(0b001011110111, 12);
+
+Exmpl: Start
+irsend.sendRC5(0b000111110111, 12);
+
+Exmpl: Stop
+irsend.sendRC5(0b000111110110, 12);
+

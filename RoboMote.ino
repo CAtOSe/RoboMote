@@ -25,6 +25,9 @@ long newPos;
 // ==========   BUTTONS   ===========
 static const int8 okPin = 5;
 static const int8 backPin = 6;
+static const int8 startPin = A0;
+static const int8 stopPin = A1;
+static const int8 sendPin = A2;
 
 
 // ============   GUI   =============
@@ -41,7 +44,17 @@ String bot;
 bool sdError = false;
 #include "sd.h"
 
+
+// ============   IR   ==============
+#include "ir.h"
+
 void setup() {
+  pinMode(okPin, INPUT);
+  pinMode(backPin, INPUT);
+  pinMode(startPin, INPUT);
+  pinMode(stopPin, INPUT);
+  pinMode(sendPin, INPUT);
+
   Serial.begin(9600);
 
   oled.begin(&Adafruit128x32, I2C_ADDRESS);
@@ -63,6 +76,16 @@ void setup() {
 void loop() {
   if (inputChange != 0 && inputChange != 1) delay(300);
   inputChange = readInputs();
+
+  if (inputChange > 15) {
+    if (inputChange == 16) {
+      startMiniSumo();
+    } else if (inputChange == 32) {
+      stopMiniSumo();
+    } else if (inputChange == 64) {
+      programMiniSumo();
+    }
+  }
 
   // Start from robot selection (menuState: 0)
   if (menuState == 0) {
@@ -330,6 +353,15 @@ int8 readInputs() {
 
   // Back Button
   if (digitalRead(backPin)) r += 4;
+
+  // Start Button
+  if (digitalRead(startPin)) r += 16;
+
+  // Stop Button
+  if (digitalRead(stopPin)) r += 32;
+
+  // Send Button
+  if (digitalRead(sendPin)) r += 64;
 
   return r;
 }

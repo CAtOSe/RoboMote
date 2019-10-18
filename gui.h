@@ -201,7 +201,7 @@ bool updateValue() {
 
   if (vPos == -1) {
     tempVarI = max(tempVarI, 0);
-    tempVarI = min(tempVarI, 32);
+    tempVarI = min(tempVarI, 31);
   }
 
   return true;

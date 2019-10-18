@@ -5,7 +5,7 @@ typedef byte int8;
 #define FLOAT_POINTS 6
 #define ACCEL_TIME_OUT 100
 #define ACCEL_FACT_DIV 140
-#define OK_DELAY 500
+#define OK_DELAY 600
 
 // ==========   DISPLAY   ==========
 #include "SSD1306Ascii.h"
@@ -29,12 +29,16 @@ static const int8 backPin = 6;
 
 // ============   GUI   =============
 #include "gui.h"
+int8 inputChange = 0;
 const String botMenu[] = {"Mini Sumo", "mBot Line"};
 const String miniSumoMenu[] = {"Strategy", "Dohyo"};
+const String miniSumoMenu_NoSD[1] = {"Dohyo"};
 const String stratMenu[] = {"Send & Run", "Send"};
 
 
 // ============   SD   ==============
+String bot;
+bool sdError = false;
 #include "sd.h"
 
 void setup() {
@@ -45,9 +49,9 @@ void setup() {
 
   int8 cardStatus =  initSD();
   if (cardStatus > 0) {
+    sdError = true;
     throwError("SD Error", cardStatus);
   }
-
 
   buildMenu(2, botMenu, true);
   printMenu();
@@ -57,7 +61,8 @@ void setup() {
 
 
 void loop() {
-  int8 inputChange = readInputs();
+  if (inputChange != 0 && inputChange != 1) delay(300);
+  inputChange = readInputs();
 
   // Start from robot selection (menuState: 0)
   if (menuState == 0) {
@@ -65,15 +70,38 @@ void loop() {
        printMenu();
     } else if(inputChange == 2) {
       // Mini Sumo is selected:
+      bot = MINI_SUMO_DIR;
       if (menuPos == 0) {
-        buildMenu(2, miniSumoMenu, true);
+        if (!sdError) buildMenu(2, miniSumoMenu, true);
+        else buildMenu(1, miniSumoMenu_NoSD, true);
         menuState = 1;
         printMenu();
-        delay(PRESS_DELAY);
       }
       // mBot Line is selected:
       else if (menuPos == 1) {
-
+        if (!sdError) {
+          bot = MBOT_DIR;
+          // Load strategy list
+          int8 r = loadStratList();
+          if(r == 0) {
+            if (stCount > 0) {
+              buildMenu(stCount, strats, false);
+              menuState = 4;
+              printMenu();
+            } else {
+              oled.clear();
+              oled.set2X();
+              oled.setCursor(0, 1);
+              oled.println("No Strategies");
+              delay(OK_DELAY * 2);
+              while(inputChange == 0);
+              printMenu();
+            }
+          } else {
+            throwError("SD ", r);
+            printMenu();
+          }
+        }
       }
     }
   }
@@ -84,23 +112,39 @@ void loop() {
       lastChange = millis();
       printMenu();
     } else if (inputChange == 2) {
-      // Load strategy list
-      int8 r = loadStratList();
-      if(r == 0) {
-        buildMenu(stCount, strats, false);
-        menuState = 2;
-        printMenu();
-        delay(PRESS_DELAY);
-      } else {
-        throwError("SD ", r);
-        printMenu();
-        delay(PRESS_DELAY);
+      if (menuPos == 0 && !sdError) {
+        // Load strategy list
+        int8 r = loadStratList();
+        if(r == 0) {
+          if (stCount > 0) {
+            buildMenu(stCount, strats, false);
+            menuState = 2;
+            printMenu();
+          } else {
+            oled.clear();
+            oled.set2X();
+            oled.setCursor(0, 1);
+            oled.println("No Strategies");
+            delay(1500);
+            printMenu();
+          }
+        } else {
+          throwError("SD ", r);
+          printMenu();
+        }
+      } else if (menuPos == 1 && !sdError) {
+        // Dohyo Menu
+        buildEditor(-1);
+        printEditor();
+      }  else if (menuPos == 0 && sdError) {
+        // Dohyo Menu
+        buildEditor(-1);
+        printEditor();
       }
     } else if (inputChange == 4) {
       buildMenu(2, botMenu, true);
       menuState = 0;
       printMenu();
-      delay(PRESS_DELAY);
     }
   }
 
@@ -118,18 +162,15 @@ void loop() {
         addVariables(2, vars+1);
         menuState = 3;
         printMenu();
-        delay(PRESS_DELAY);
       } else {
         throwError("SD ", r);
         printMenu();
-        delay(PRESS_DELAY);
       }
 
     } else if (inputChange == 4) {
       buildMenu(2, miniSumoMenu, true);
       menuState = 1;
       printMenu();
-      delay(PRESS_DELAY);
     }
   }
 
@@ -138,37 +179,89 @@ void loop() {
     if (inputChange == 1) {
        printMenu();
     } else if (inputChange == 2) {
-      buildEditor(menuPos - 2);
-      menuState = 10;
-      printEditor();
-      delay(PRESS_DELAY);
+      if (menuPos > 1) {
+        buildEditor(menuPos - 2);
+        printEditor();
+      }
     } else if (inputChange == 4) {
       buildMenu(stCount, strats, false);
       menuState = 2;
       printMenu();
-      delay(PRESS_DELAY);
     }
+  }
+
+
+// mBot Strategies selection
+  else if (menuState == 4) {
+    if (inputChange == 1) {
+       printMenu();
+    } else if (inputChange == 2) {
+      // Load strategy
+      int8 r = loadStrat(menuPos);
+      if (r == 0 ) {
+        selectedSt = menuPos;
+        buildMenu(2, stratMenu, false);
+        appendMenu(vars, varNames);
+        addVariables(2, vars+1);
+        menuState = 5;
+        printMenu();
+      } else {
+        throwError("SD ", r);
+        printMenu();
+      }
+
+    } else if (inputChange == 4) {
+      buildMenu(2, botMenu, true);
+      menuState = 0;
+      printMenu();
+    }
+  }
+
+  // mBot Strategy/Variable Screen
+  else if (menuState == 5) {
+    if (inputChange == 1) {
+       printMenu();
+    } else if (inputChange == 2) {
+      if (menuPos > 1) {
+        buildEditor(menuPos - 2);
+        printEditor();
+      }
+    } else if (inputChange == 4) {
+      buildMenu(stCount, strats, false);
+      menuState = 4;
+      printMenu();
+    }
+  }
+
 
 
   // Variable editor
-  } else if (menuState == 10) {
+  else if (menuState == 10) {
     if (inputChange == 1) {
       if (updateValue()) printEditor();
-    } else if (inputChange == 2 || inputChange == 4) {
-      if (inputChange == 2) {
-        if (type == 3) {
-          floatSelected = !floatSelected;
-          printEditor();
-        } else {
-          saveValue();
-          writeToFile(selectedSt);
+    } else if (inputChange == 2) {
+      if (type == 3) {
+        floatSelected = !floatSelected;
+        printEditor();
+      } else {
+        saveValue();
+        writeToFile(selectedSt);
 
-          menuState = 3;
-          resumeMenu();
-          printMenu();
-        }
+        resumeMenu();
+        printMenu();
       }
-      delay(PRESS_DELAY);
+    } else if (inputChange == 4) {
+      resumeMenu();
+      Serial.println(prevMenuState);
+      printMenu();
+    }  else if (inputChange == 8) {
+      saveValue();
+      writeToFile(selectedSt);
+
+      resumeMenu();
+      printMenu();
+
+      delay(OK_DELAY * 2);
     }
   }
 
@@ -182,6 +275,7 @@ void loop() {
  * 1 - encoder change
  * 2 - OK Button pressed
  * 4 - Back Button pressed
+ * 8 - Long Press OK
  */
 
 int8 readInputs() {
@@ -227,7 +321,7 @@ int8 readInputs() {
     // OK BUTTON PRESS n HOLD
     if (digitalRead(okPin)) {
       long okTime = millis();
-      while (digitalRead(okPin));
+      while (digitalRead(okPin) && (millis() < okTime + 1000));
       if (millis() - okTime > OK_DELAY) r+= 8;
       else r += 2;
     }

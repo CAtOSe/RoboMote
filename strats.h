@@ -1,4 +1,5 @@
 #define MINI_SUMO_DIR "MINISUMO"
+#define MBOT_DIR "MBOT"
 #define END_CHAR '#'
 #define SKIP_CHAR '*'
 #define MAX_STRATS 10

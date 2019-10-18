@@ -4,6 +4,7 @@ static const int8 OLED_WIDTH_SMALL = 21;
 
 // State var setup
 int8 menuState = 0;
+int8 prevMenuState = 0;
 int menuPos = 0;
 int8 menuPosMax = 0;
 
@@ -22,6 +23,13 @@ long offset = 0;
 
 bool floatSelected = 0;
 int floatSelPos = 0;
+int8 ring = 0;
+
+int vPos = 0;
+int8 type = 0;
+float tempVarF = 0;
+boolean tempVarB = 0;
+long tempVarI = 0;
 // =========== FUNCTIONS =============
 int8 countDigit(int n)
 {
@@ -116,6 +124,7 @@ void printMenu() {
 }
 
 void resumeMenu() {
+  menuState = prevMenuState;
   menuPos = 0;
   oldPos = menuPos;
   enc.write(0);
@@ -138,25 +147,29 @@ void throwError(char *message, int code) {
   }
 
   oled.print("Press OK");
-  delay(300);
+  delay(OK_DELAY);
   while(!digitalRead(okPin));
+  delay(OK_DELAY);
 }
-
-
-int8 vPos = 0;
-int8 type = 0;
-float tempVarF = 0;
-boolean tempVarB = 0;
-long tempVarI = 0;
 
 String formatBool(bool val) {
   if (val) return String("True");
   else return String("False");
 }
 
-void buildEditor(int8 pos) {
+void buildEditor(int pos) {
+  Serial.println(menuState);
+  prevMenuState = menuState;
+  menuState = 10;
   editorOpen = true;
 
+  if (pos == -1) {
+    // Dohyo
+    type = 2;
+    tempVarI = ring;
+    vPos = -1;
+    return;
+  }
   vPos = pos;
   type = varType[pos];
 
@@ -179,18 +192,30 @@ bool updateValue() {
     if (floatSelected) {
       tempVarF += offset / pow(10, floatSelPos + 1);
     } else {
+
       floatSelPos += offset;
       if (floatSelPos < 0) floatSelPos = 0;
       else if (floatSelPos > FLOAT_POINTS - 1 ) floatSelPos = FLOAT_POINTS - 1;
     }
   }
 
+  if (vPos == -1) {
+    tempVarI = max(tempVarI, 0);
+    tempVarI = min(tempVarI, 32);
+  }
+
   return true;
 }
 
 void saveValue() {
+  if (vPos == -1) {
+    ring = tempVarI;
+    return;
+  }
+
   if (type == 1) varVals[vPos] = tempVarB;
   else if (type == 2) varVals[vPos] = tempVarI;
+  else if (type == 3) memcpy(&varVals[vPos], &tempVarF, sizeof(tempVarF));
 }
 
 
@@ -199,9 +224,17 @@ void printEditor() {
   oled.clear();
   oled.set1X();
   oled.setInvertMode(0);
-  oled.println(varNames[vPos]);
-  if (type == 1) oled.println(formatBool(varVals[vPos]));
-  else if (type == 2) oled.println(varVals[vPos]);
+
+  if (vPos == -1) {
+    oled.set2X();
+    oled.println("Dohyo");
+    oled.setCursor(0, 2);
+    oled.println(tempVarI);
+  } else {
+    oled.println(varNames[vPos]);
+    if (type == 1) oled.println(formatBool(varVals[vPos]));
+    else if (type == 2) oled.println(varVals[vPos]);
+  }
 
   if (type == 1) {
     oled.set2X();
@@ -225,7 +258,7 @@ void printEditor() {
 
     int8 cursor = countDigit(abs(tempVarF)) + 1;
     String num = String(tempVarF, FLOAT_POINTS);
-    if (tempVarF < 0) cursor++;
+    if (tempVarF < 0 || tempVarF == -0.0) cursor++;
     cursor += floatSelPos;
 
     if (!floatSelected) {

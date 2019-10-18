@@ -21,7 +21,7 @@ char readChar() {
 
 
 int8 loadStratList() {
-  int8 res = PF.openDirectory(&dir, MINI_SUMO_DIR);
+  int8 res = PF.openDirectory(&dir, bot.c_str());
   if (res > 0) return res;
 
   fInfo.fname[0] = 1;
@@ -49,7 +49,7 @@ int8 loadStratList() {
 }
 
 int8 loadStrat(int8 index) {
-  String path = String("MINISUMO/" + strats[index]);
+  String path = String(bot + "/" + strats[index]);
   int8 res = PF.open(path.c_str());
   if (res > 0) return res;
 
@@ -107,7 +107,7 @@ int8 loadStrat(int8 index) {
 }
 
 int8 writeToFile(int8 index) {
-  String path = String("MINISUMO/" + strats[index]);
+  String path = String(bot + "/" + strats[index]);
   int8 res = PF.open(path.c_str());
   if (res > 0) return res;
 

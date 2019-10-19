@@ -1,11 +1,7 @@
 // ===========   GENERAL   ==========
 typedef byte int8;
+#include "config.h"
 #include "strats.h"
-#define PRESS_DELAY 300
-#define FLOAT_POINTS 6
-#define ACCEL_TIME_OUT 100
-#define ACCEL_FACT_DIV 140
-#define OK_DELAY 600
 
 // ==========   DISPLAY   ==========
 #include "SSD1306Ascii.h"

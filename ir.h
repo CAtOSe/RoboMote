@@ -7,7 +7,6 @@ IRsend irsend;
 static const byte progMsg = 0b001011;
 static const byte driveMsg = 0b000111;
 
-static const uint16_t necAddr = 0xDAB;
 static const byte necStartT = 0x1;
 static const byte necStrategyT = 0x2;
 static const byte necVarT = 0x3;

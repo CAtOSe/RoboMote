@@ -1,7 +1,3 @@
-static const int8 MAX_CHAR = 16;
-static const int8 MAX_MENU = 12;
-static const int8 OLED_WIDTH_SMALL = 21;
-
 // State var setup
 int8 menuState = 0;
 int8 prevMenuState = 0;

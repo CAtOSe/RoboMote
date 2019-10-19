@@ -1,5 +1,6 @@
 #define MINI_SUMO_DIR "MINISUMO"
 #define MBOT_DIR "MBOT"
+#define STRAT_NUM "STRAT"
 #define END_CHAR '#'
 #define SKIP_CHAR '*'
 #define MAX_STRATS 10
@@ -9,6 +10,7 @@ String strats[MAX_STRATS];
 int8 stCount = 0;
 
 int8 selectedSt = 0;
+int8 stNumber = 0;
 
 String varNames[MAX_VARIABLES];
 long varVals[MAX_VARIABLES];

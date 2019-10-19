@@ -36,7 +36,7 @@ int8 inputChange = 0;
 const String botMenu[] = {"Mini Sumo", "mBot Line"};
 const String miniSumoMenu[] = {"Strategy", "Dohyo"};
 const String miniSumoMenu_NoSD[1] = {"Dohyo"};
-const String stratMenu[] = {"Send & Run", "Send"};
+const String stratMenu[] = {"Send", "Send & Run"};
 
 
 // ============   SD   ==============
@@ -55,7 +55,7 @@ void setup() {
   pinMode(stopPin, INPUT);
   pinMode(sendPin, INPUT);
 
-  Serial.begin(9600);
+  // Serial.begin(9600);
 
   oled.begin(&Adafruit128x32, I2C_ADDRESS);
   oled.setFont(OLED_FONT);
@@ -74,7 +74,7 @@ void setup() {
 
 
 void loop() {
-  if (inputChange != 0 && inputChange != 1) delay(300);
+  if (inputChange > 1 && inputChange < 15) delay(300);
   inputChange = readInputs();
 
   if (inputChange > 15) {
@@ -112,12 +112,8 @@ void loop() {
               menuState = 4;
               printMenu();
             } else {
-              oled.clear();
-              oled.set2X();
-              oled.setCursor(0, 1);
-              oled.println("No Strategies");
-              delay(OK_DELAY * 2);
-              while(inputChange == 0);
+              showMsg("No Strategies");
+              delay(1000);
               printMenu();
             }
           } else {
@@ -144,11 +140,8 @@ void loop() {
             menuState = 2;
             printMenu();
           } else {
-            oled.clear();
-            oled.set2X();
-            oled.setCursor(0, 1);
-            oled.println("No Strategies");
-            delay(1500);
+            showMsg("No Strategies");
+            delay(1000);
             printMenu();
           }
         } else {
@@ -202,9 +195,29 @@ void loop() {
     if (inputChange == 1) {
        printMenu();
     } else if (inputChange == 2) {
-      if (menuPos > 1) {
-        buildEditor(menuPos - 2);
-        printEditor();
+      if (menuPos == 0) {
+        showMsg("Sent");
+        sendStrat();
+        delay(1000);
+        printMenu();
+      } else if (menuPos == 1) {
+        showMsg("Running");
+        sendStrat();
+
+        delay(IR_DELAY);
+        programMiniSumo();
+
+        delay(IR_DELAY);
+        startMiniSumo();
+
+        delay(1000);
+        printMenu();
+
+      } else if (menuPos > 1) {
+        if (!varNames[menuPos - 2].equals(STRAT_NUM)) {
+          buildEditor(menuPos - 2);
+          printEditor();
+        }
       }
     } else if (inputChange == 4) {
       buildMenu(stCount, strats, false);
@@ -245,9 +258,23 @@ void loop() {
     if (inputChange == 1) {
        printMenu();
     } else if (inputChange == 2) {
-      if (menuPos > 1) {
-        buildEditor(menuPos - 2);
-        printEditor();
+      if (menuPos == 0) {
+        showMsg("Sent");
+        sendStrat();
+        delay(1000);
+        printMenu();
+      } else if (menuPos == 1) {
+        showMsg("Running");
+        sendStrat();
+
+        delay(1000);
+        printMenu();
+
+      } else if (menuPos > 1) {
+        if (!varNames[menuPos - 2].equals(STRAT_NUM)) {
+          buildEditor(menuPos - 2);
+          printEditor();
+        }
       }
     } else if (inputChange == 4) {
       buildMenu(stCount, strats, false);
@@ -275,7 +302,6 @@ void loop() {
       }
     } else if (inputChange == 4) {
       resumeMenu();
-      Serial.println(prevMenuState);
       printMenu();
     }  else if (inputChange == 8) {
       saveValue();

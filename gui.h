@@ -158,7 +158,6 @@ String formatBool(bool val) {
 }
 
 void buildEditor(int pos) {
-  Serial.println(menuState);
   prevMenuState = menuState;
   menuState = 10;
   editorOpen = true;
@@ -281,4 +280,11 @@ void printEditor() {
       oled.print(num[x]);
     }
   }
+}
+
+void showMsg(String msg) {
+  oled.clear();
+  oled.set2X();
+  oled.setCursor(0, 1);
+  oled.println(msg);
 }

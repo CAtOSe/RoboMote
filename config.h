@@ -3,7 +3,7 @@
 // =======================================
 
 // Address of your remote. Set this to a value no one else has.
-static const uint16_t necAddr = 0xDAB;
+static const uint16_t necAddr = 0xABC;
 
 #define MBOT_START 1
 #define MBOT_STOP 2

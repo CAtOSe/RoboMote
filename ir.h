@@ -85,5 +85,5 @@ bool sendStrat() {
 
 
 void sendEvent(int8 event) {
-  irsend.sendNEC(message(necAddr, necEndT, event), 32);
+  irsend.sendNEC(message(necAddr, necEventT, event), 32);
 }

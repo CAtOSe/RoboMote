@@ -5,8 +5,6 @@
 // Address of your remote. Set this to a value no one else has.
 static const uint16_t necAddr = 0xABC;
 
-#define MBOT_START 1
-#define MBOT_STOP 2
 
 #define PRESS_DELAY 300 // Delay before another click
 #define FLOAT_POINTS 6 // Floating point precision
@@ -16,6 +14,11 @@ static const uint16_t necAddr = 0xABC;
 
 #define MINI_SUMO_DIR "MINISUMO" // Name of Mini Sumo strategies directory
 #define MBOT_DIR "MBOT" // Name of mBot strategies directory
+
+// Event numbers for mbot
+#define MBOT_START 1
+#define MBOT_STOP 2
+#define MBOT_PROGRAM 3
 
 // Number of maximum stratgies to have space for. Don't set too high or you'll have memory problems.
 #define MAX_STRATS 10

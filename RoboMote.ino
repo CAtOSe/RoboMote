@@ -86,6 +86,8 @@ void loop() {
       sendEvent(MBOT_START);
     } else if (inputChange == 32) {
       sendEvent(MBOT_STOP);
+    } else if (inputChange == 64) {
+      sendEvent(MBOT_PROGRAM);
     }
   }
 

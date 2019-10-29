@@ -10,6 +10,7 @@ static const byte driveMsg = 0b000111;
 static const byte necStartT = 0x1;
 static const byte necStrategyT = 0x2;
 static const byte necVarT = 0x3;
+static const byte necEventT = 0x4;
 static const byte necEndT = 0x6;
 
 static const int IR_DELAY = 50;
@@ -80,4 +81,9 @@ bool sendStrat() {
   irsend.sendNEC(message(necAddr, necEndT, msgNum), 32);
 
   return true;
+}
+
+
+void sendEvent(int8 event) {
+  irsend.sendNEC(message(necAddr, necEventT, event), 32);
 }

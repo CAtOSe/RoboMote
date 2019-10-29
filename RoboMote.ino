@@ -73,13 +73,21 @@ void loop() {
   if (inputChange > 1 && inputChange < 15) delay(300);
   inputChange = readInputs();
 
-  if (inputChange > 15) {
+  if (inputChange > 15 && bot.equals(MINI_SUMO_DIR)) {
     if (inputChange == 16) {
       startMiniSumo();
     } else if (inputChange == 32) {
       stopMiniSumo();
     } else if (inputChange == 64) {
       programMiniSumo();
+    }
+  } else if (inputChange > 15 && bot.equals(MBOT_DIR)) {
+    if (inputChange == 16) {
+      sendEvent(MBOT_START);
+    } else if (inputChange == 32) {
+      sendEvent(MBOT_STOP);
+    } else if (inputChange == 64) {
+      sendEvent(MBOT_PROGRAM);
     }
   }
 

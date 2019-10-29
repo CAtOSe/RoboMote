@@ -5,6 +5,9 @@
 // Address of your remote. Set this to a value no one else has.
 static const uint16_t necAddr = 0xDAB;
 
+#define MBOT_START 1
+#define MBOT_STOP 2
+
 #define PRESS_DELAY 300 // Delay before another click
 #define FLOAT_POINTS 6 // Floating point precision
 #define ACCEL_TIME_OUT 100 // How long until input acceleration times out?

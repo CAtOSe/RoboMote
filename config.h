@@ -6,6 +6,14 @@
 static const uint16_t necAddr = 0xABC;
 
 
+// ==========   BUTTONS   ===========
+static const int8 okPin = 4;
+static const int8 backPin = 6;
+static const int8 startPin = 7;
+static const int8 stopPin = 5;
+static const int8 programPin = 8;
+
+
 #define PRESS_DELAY 300 // Delay before another click
 #define FLOAT_POINTS 6 // Floating point precision
 #define ACCEL_TIME_OUT 100 // How long until input acceleration times out?

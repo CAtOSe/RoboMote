@@ -18,14 +18,6 @@ long oldPos  = -999;
 long newPos;
 
 
-// ==========   BUTTONS   ===========
-static const int8 okPin = 5;
-static const int8 backPin = 6;
-static const int8 startPin = A0;
-static const int8 stopPin = A1;
-static const int8 sendPin = A2;
-
-
 // ============   GUI   =============
 #include "gui.h"
 int8 inputChange = 0;
@@ -49,7 +41,7 @@ void setup() {
   pinMode(backPin, INPUT);
   pinMode(startPin, INPUT);
   pinMode(stopPin, INPUT);
-  pinMode(sendPin, INPUT);
+  pinMode(programPin, INPUT);
 
   // Serial.begin(9600);
 
@@ -391,7 +383,7 @@ int8 readInputs() {
   if (digitalRead(stopPin)) r += 32;
 
   // Send Button
-  if (digitalRead(sendPin)) r += 64;
+  if (digitalRead(programPin)) r += 64;
 
   return r;
 }

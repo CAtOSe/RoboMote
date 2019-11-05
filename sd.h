@@ -6,8 +6,8 @@ FILINFO fInfo;
 int8 lineLen;
 
 int8 initSD() {
-  pinMode(10, OUTPUT);
-  digitalWrite(10, true); // Disable Ethernet
+  // pinMode(10, OUTPUT);
+  // digitalWrite(10, true); // Disable Ethernet
 
   return PF.begin(&fs);
 }

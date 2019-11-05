@@ -12,6 +12,8 @@ static const int8 backPin = 6;
 static const int8 startPin = 7;
 static const int8 stopPin = 5;
 static const int8 programPin = 8;
+static const int8 encoderPin1 = 2;
+static const int8 encoderPin2 = 3;
 
 
 #define PRESS_DELAY 300 // Delay before another click

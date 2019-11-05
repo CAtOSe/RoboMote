@@ -13,7 +13,7 @@ SSD1306AsciiAvrI2c oled;
 
 // ==========   ENCODER   ==========
 #include <Encoder.h>
-Encoder enc(3, 2);
+Encoder enc(encoderPin1, encoderPin2);
 long oldPos  = -999;
 long newPos;
 

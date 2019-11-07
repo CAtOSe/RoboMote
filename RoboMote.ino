@@ -263,8 +263,10 @@ void loop() {
         showMsg("Running");
         sendStrat();
 
-        delay(1000);
+        delay(800);
+        sendEvent(MBOT_START);
         printMenu();
+        delay(500);
 
       } else if (menuPos > 1) {
         if (!varNames[menuPos - 2].equals(STRAT_NUM)) {
@@ -306,7 +308,7 @@ void loop() {
       resumeMenu();
       printMenu();
 
-      delay(OK_DELAY * 2);
+      delay(1000);
     }
   }
 
